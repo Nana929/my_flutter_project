@@ -55,9 +55,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var _counter= 0.0;
+  var numCounter= 0;
+  var _counter = 0.0;
   var myFontSize=30.0;
+  var isChecked= false;
 
+  final TextEditingController _num1 = TextEditingController();
+  final TextEditingController _num2 = TextEditingController();
   void setNewValue(double value){
     setState(() {
       _counter = value;
@@ -115,15 +119,51 @@ void _incrementCounter() {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // Text(
+            //   'You have pushed the button this many times:',
+            //   style: TextStyle(fontSize: myFontSize)
+            // ),
+            Image.asset("images/ac_logo.jpg",width: 300),
+            TextField(controller:_num1,decoration:const 
+            InputDecoration(
+              hintText: "Please enter an number:",
+              labelText: "Number 1",
+              border:OutlineInputBorder()
+            ),),
+            TextField(controller:_num2,decoration:const 
+            InputDecoration(
+              hintText: "Please enter a second number:",
+              labelText: "Number 2",
+              border:OutlineInputBorder()
+            ),),
             Text(
-              'You have pushed the button this many times:',
+              '$numCounter',
               style: TextStyle(fontSize: myFontSize)
             ),
-            Text(
-              '$_counter',
-              style: TextStyle(fontSize: myFontSize)
-            ),
-            Slider(value: _counter, max:100.0,onChanged: setNewValue,min:0.0,)
+            Slider(value: _counter, max:100.0,onChanged: setNewValue,min:0.0,),
+            ElevatedButton(onPressed:(){
+              var n1=int.parse(_num1.value.text);
+              var n2 = int.parse(_num2.value.text);
+              var sum=n1+n2;
+              setState(() {
+                numCounter=sum;
+              });
+
+            },child:const Text
+            ("Add")),
+            // TextButton(onPressed:(){},child:const Text
+            // ("Text Button")),
+            // OutlinedButton(onPressed:(){},child:const Text
+            // ("Outline Button")),
+            // Checkbox(value: isChecked, onChanged:(value){
+            //   setState(() {
+            //     isChecked=value!;
+            //   });
+            Switch(value: isChecked, onChanged:(newValue){
+              setState(() {
+                isChecked=newValue;
+              });
+            })
           ],
         ),
       ),
