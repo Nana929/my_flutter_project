@@ -11,24 +11,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 122, 129, 112)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -39,15 +25,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -55,123 +32,338 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var numCounter= 0;
-  var _counter = 0.0;
-  var myFontSize=30.0;
-  var isChecked= false;
-
-  final TextEditingController _num1 = TextEditingController();
-  final TextEditingController _num2 = TextEditingController();
-  void setNewValue(double value){
-    setState(() {
-      _counter = value;
-      myFontSize=value;
-    }); 
-  }
-
-void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      if(_counter <99.0)
-          _counter++;
-          myFontSize++;
-    });
-  }
-
+  //
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            // Text(
-            //   'You have pushed the button this many times:',
-            //   style: TextStyle(fontSize: myFontSize)
-            // ),
-            Image.asset("images/ac_logo.jpg",width: 300),
-            TextField(controller:_num1,decoration:const 
-            InputDecoration(
-              hintText: "Please enter an number:",
-              labelText: "Number 1",
-              border:OutlineInputBorder()
-            ),),
-            TextField(controller:_num2,decoration:const 
-            InputDecoration(
-              hintText: "Please enter a second number:",
-              labelText: "Number 2",
-              border:OutlineInputBorder()
-            ),),
-            Text(
-              '$numCounter',
-              style: TextStyle(fontSize: myFontSize)
-            ),
-            Slider(value: _counter, max:100.0,onChanged: setNewValue,min:0.0,),
-            ElevatedButton(onPressed:(){
-              var n1=int.parse(_num1.value.text);
-              var n2 = int.parse(_num2.value.text);
-              var sum=n1+n2;
-              setState(() {
-                numCounter=sum;
-              });
+        body: Center(
+            // padding of the whole page
+            child: Padding(
+      padding: EdgeInsets.fromLTRB(12, 30, 12, 20),
 
-            },child:const Text
-            ("Add")),
-            // TextButton(onPressed:(){},child:const Text
-            // ("Text Button")),
-            // OutlinedButton(onPressed:(){},child:const Text
-            // ("Outline Button")),
-            // Checkbox(value: isChecked, onChanged:(value){
-            //   setState(() {
-            //     isChecked=value!;
-            //   });
-            Switch(value: isChecked, onChanged:(newValue){
-              setState(() {
-                isChecked=newValue;
-              });
-            })
-          ],
-        ),
+      // 1 column 8 rows
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment
+            .spaceBetween, // The Column( ) uses SpaceBetween for the layout
+
+        children: [
+          // 1st row: text to the center
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Column(
+              children: [
+                Text("browse categories".toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                    )),
+              ],
+            ),
+          ]),
+
+          // 2nd row: text to the left
+          Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Expanded(
+              // expand text
+              child: Column(
+                children: [
+                  Text(
+                    "Not sure about exactly which recipe you're looking for? "
+                    "Do a search, or dive into our most popular categories.",
+                    style: TextStyle(fontSize: 15, letterSpacing: 1),
+                  ),
+                ],
+              ),
+            ),
+          ]),
+
+          // 3rd row: text to the center
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Column(
+              children: [
+                Text("by meat".toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2)),
+              ],
+            ),
+          ]),
+
+          // 4th row: meat images
+          Row(
+              // 1 row, 4 columns
+              mainAxisAlignment: MainAxisAlignment
+                  .spaceAround, // The rows of images use SpaceAround to put spacing around them.
+              children: [
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      CircleAvatar(
+                          backgroundImage: AssetImage('images/beef.jpg'),
+                          radius: 46),
+                      Text("beef".toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              // add shadow to the text
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 6.0,
+                                color: Colors.black,
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      CircleAvatar(
+                          backgroundImage: AssetImage('images/chicken.jpg'),
+                          radius: 46),
+                      Text(
+                        "chicken".toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            // add shadow to the text
+                            Shadow(
+                              offset: Offset(1.0, 1.0),
+                              blurRadius: 6.0,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      CircleAvatar(
+                          backgroundImage: AssetImage('images/pork.jpg'),
+                          radius: 46),
+                      Text("pork".toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              // add shadow to the text
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 6.0,
+                                color: Colors.black,
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      CircleAvatar(
+                          backgroundImage: AssetImage('images/seafood.jpg'),
+                          radius: 46),
+                      Text("seafood".toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              // add shadow to the text
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 6.0,
+                                color: Colors.black,
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                ]),
+              ]),
+
+          // 5th row: text to the center
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Column(
+              children: [
+                Text("by course".toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2)),
+              ],
+            ),
+          ]),
+
+          // 6th row: course images
+          Row(
+              // 1 row, 4 columns
+              mainAxisAlignment: MainAxisAlignment
+                  .spaceAround, // The rows of images use SpaceAround to put spacing around them.
+              children: [
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('images/main-dishes.jpg'),
+                              radius: 46),
+                          Text("Main Dishes", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage: AssetImage('images/salad.jpg'),
+                              radius: 46),
+                          Text("Salad", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('images/side-dishes.jpg'),
+                              radius: 46),
+                          Text("Side Dishes", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('images/crockpot.jpg'),
+                              radius: 46),
+                          Text("Crockpot", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+              ]),
+
+          // 7th row: text to the center
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Column(
+              children: [
+                Text("by dessert".toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2)),
+              ],
+            ),
+          ]),
+
+          // 8th row: dessert images
+          Row(
+              // 1 row, 4 columns
+              mainAxisAlignment: MainAxisAlignment
+                  .spaceAround, // The rows of images use SpaceAround to put spacing around them.
+              children: [
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('images/ice—cream.jpg'),
+                              radius: 46),
+                          Text("Ice Cream", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('images/brownies.jpg'),
+                              radius: 46),
+                          Text("Brownies", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar( 
+                              backgroundImage: AssetImage('images/pie.jpg'),
+                              radius: 46),
+                          Text("Pies", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+                Column(children: [
+                  Stack(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundImage: AssetImage('images/cookies.jpg'),
+                              radius: 46),
+                          Text("Cookies", style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ]),
+              ]),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    )));
   }
 }
