@@ -1,161 +1,217 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'database.dart';
+import 'todo_item.dart';
+import 'new.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final database =
+      await $FloorAppDatabase.databaseBuilder('shopping_list.db').build();
+  runApp(MyApp(database: database));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppDatabase database;
+  const MyApp({super.key, required this.database});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
- 
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 122, 129, 112)),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Shopping List',
+      home: MyHomePage(database: database),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-  final String title;
+  final AppDatabase database;
+  const MyHomePage({super.key, required this.database});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var numCounter = 0;
-  var myFontSize = 30.0;
-  var isChecked = false;
-  String _loadedText = '';
+  List<TodoItem> items = [];
+  TodoItem? selectedItem;
+  final TextEditingController _itemController = TextEditingController();
+  final TextEditingController _quantityController = TextEditingController();
 
-  final TextEditingController _num1 = TextEditingController();
-  final TextEditingController _num2 = TextEditingController();
-
-  void setNewValue(double value){ 
-    setState(() {
-      myFontSize = value;
-    });
-  }
-
-   @override
+  @override
   void initState() {
     super.initState();
-    _loadSavedData();
+    _loadItems();
   }
 
-  void _loadSavedData() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _loadItems() async {
+    final loadedItems = await widget.database.todoDao.findAllTodoItems();
     setState(() {
-      _num1.text = prefs.getString('saved_username') ?? ''; 
-      _num2.text = prefs.getString('saved_password') ?? ''; 
+      items = loadedItems;
     });
   }
 
-
-  void _saveLoginData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('saved_username', _num1.text); // 存储用户名
-    await prefs.setString('saved_password', _num2.text); // 存储密码
+  @override
+  void dispose() {
+    _itemController.dispose();
+    _quantityController.dispose();
+    super.dispose();
   }
 
-  Future<void> _removeData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('saved_username');
-    await prefs.remove('saved_password');
+  void _deleteItem(TodoItem item) async {
+    await widget.database.todoDao.deleteItem(item);
     setState(() {
-      _num1.clear();
-      _num2.clear();
+      items.remove(item);
+      selectedItem = null;
     });
   }
-
-  void _showAlertDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Notion'),
-          content: Text(
-              'Would you like to save your username and password for the next time ？'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                _removeData();
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Confirm'),
-              onPressed: () {
-                _saveLoginData();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
-
+    bool isLargeScreen = MediaQuery.of(context).size.width > 600;
     return Scaffold(
-      appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
-      ),
-      body: Center(
-
-        child: Column(
-        
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-
-            Image.asset("images/ac_logo.jpg", width: 300),
-            TextField(
-              controller: _num1,
-              decoration: const InputDecoration(
-                  hintText: "Please enter the login account:",
-                  labelText: "Login",
-                  border: OutlineInputBorder()),
-                   obscureText: true,
+      appBar: AppBar(title: const Text('Shopping List')),
+      body: Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: TextField(
+                          controller: _itemController,
+                          decoration: const InputDecoration(
+                            hintText: 'Type the item here',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 2,
+                        child: TextField(
+                          controller: _quantityController,
+                          decoration: const InputDecoration(
+                            hintText: 'Type the quantity here',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_itemController.text.isNotEmpty &&
+                              _quantityController.text.isNotEmpty) {
+                            final newItem = TodoItem(
+                              items.isNotEmpty ? items.last.id + 1 : 1,
+                              _itemController.text,
+                              int.tryParse(_quantityController.text) ?? 1,
+                            );
+                            await widget.database.todoDao.insertItem(newItem);
+                            _loadItems();
+                            _itemController.clear();
+                            _quantityController.clear();
+                          }
+                        },
+                        child: const Text('Add'),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: items.isEmpty
+                      ? const Center(child: Text('No items in the list'))
+                      : ListView.builder(
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(items[index].todoItem),
+                              subtitle:
+                                  Text('Quantity: ${items[index].quantity}'),
+                              onTap: () async {
+                                if (isLargeScreen) {
+                                  setState(() {
+                                    selectedItem = items[index];
+                                  });
+                                } else {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewPage(
+                                        item: items[index],
+                                        database: widget.database,
+                                      ),
+                                    ),
+                                  );
+                                  if (result == true) {
+                                    _loadItems(); // Refresh the list after deletion
+                                  }
+                                }
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
-            TextField(
-              controller: _num2,
-              decoration: const InputDecoration(
-                  hintText: "Please enter the password:",
-                  labelText: "Password",
-                  border: OutlineInputBorder()),
-                   obscureText: true,
+          ),
+          if (isLargeScreen && selectedItem != null)
+            Expanded(
+              child: DetailsPage(
+                item: selectedItem!,
+                onDelete: () => _deleteItem(selectedItem!),
+                onClose: () => setState(() => selectedItem = null),
+              ),
             ),
-            
-            ElevatedButton(
-                onPressed: () {
-                  _showAlertDialog(context);
-
-                },
-                child: const Text("login"),
-                 ),
-          ],
-        ),
+        ],
       ),
     );
-  }}
+  }
+}
 
-                  
+class DetailsPage extends StatelessWidget {
+  final TodoItem item;
+  final VoidCallback onDelete;
+  final VoidCallback onClose;
+
+  const DetailsPage({
+    super.key,
+    required this.item,
+    required this.onDelete,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Item: ${item.todoItem}', style: const TextStyle(fontSize: 20)),
+          Text('Quantity: ${item.quantity}',
+              style: const TextStyle(fontSize: 18)),
+          Text('Database ID: ${item.id}', style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: onDelete,
+                child: const Text('Delete'),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: onClose,
+                child: const Text('Close'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
